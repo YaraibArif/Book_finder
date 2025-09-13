@@ -5,7 +5,7 @@ class OpenLibraryApi {
   static final Dio _dio = Dio(
     BaseOptions(
       headers: {
-        "Accept": "application/json", // ✅ Force JSON
+        "Accept": "application/json",
       },
     ),
   );
@@ -13,7 +13,7 @@ class OpenLibraryApi {
   static Future<Map<String, dynamic>> fetchSubject(String subject) async {
     try {
       final url = "$baseUrl/subjects/$subject.json";
-      print("📡 Fetching: $url"); // 🔍 Debug URL
+      print("📡 Fetching: $url"); //Debug URL
 
       final response = await _dio.get(
         url,
@@ -23,9 +23,9 @@ class OpenLibraryApi {
         },
       );
 
-      print("✅ Status: ${response.statusCode}");
-      print("🔍 Response Type: ${response.data.runtimeType}");
-      print("📝 Response Preview: ${response.data.toString().substring(0, 200)}...");
+      print("Status: ${response.statusCode}");
+      print("Response Type: ${response.data.runtimeType}");
+      print("Response Preview: ${response.data.toString().substring(0, 200)}...");
 
       if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
         return response.data;
@@ -33,13 +33,13 @@ class OpenLibraryApi {
         throw Exception("Invalid response format");
       }
     } on DioException catch (e) {
-      print("❌ DioException: ${e.message}");
+      print("DioException: ${e.message}");
       if (e.response != null) {
-        print("🔍 Error Body: ${e.response!.data}");
+        print("Error Body: ${e.response!.data}");
       }
       throw Exception("Dio error: ${e.message}");
     } catch (e) {
-      print("❌ Unknown error: $e");
+      print("Unknown error: $e");
       throw Exception("Unknown error: $e");
     }
   }

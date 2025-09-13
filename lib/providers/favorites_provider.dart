@@ -8,12 +8,12 @@ class FavoritesProvider with ChangeNotifier {
 
   FavoritesProvider({required this.userId});
 
-  /// 🔹 Local cache
+  // Local cache
   final List<FavoriteBook> _favorites = [];
 
   List<FavoriteBook> get favorites => _favorites;
 
-  /// 🔹 Stream user favorites
+  //Stream user favorites
   Stream<List<FavoriteBook>> get favoritesStream {
     return _firestore
         .collection("users")
@@ -26,7 +26,7 @@ class FavoritesProvider with ChangeNotifier {
           .map((doc) => FavoriteBook.fromMap(doc.data()))
           .toList();
 
-      // 🟢 local cache update
+      // local cache update
       _favorites
         ..clear()
         ..addAll(list);
@@ -36,12 +36,12 @@ class FavoritesProvider with ChangeNotifier {
     });
   }
 
-  /// 🔹 Check if book is favorite
+  //Check if book is favorite
   bool isFavorite(String bookId) {
     return _favorites.any((book) => book.id == bookId);
   }
 
-  /// 🔹 Add book to favorites
+  //Add book to favorites
   Future<void> addFavorite({
     required String workKey,
     required String title,
@@ -66,7 +66,7 @@ class FavoritesProvider with ChangeNotifier {
         .set(book.toMap());
   }
 
-  /// 🔹 Remove book from favorites
+  //Remove book from favorites
   Future<void> removeFavorite(String bookId) async {
     await _firestore
         .collection("users")

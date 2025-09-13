@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
 
-    // ✅ Always go to OnBoardingScreen after 2s
+    // go to OnBoardingScreen after 2s
     Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,

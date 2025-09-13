@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🔎 Search Bar (using widget)
+            //Search Bar
             SearchBarWidget(
               controller: _searchController,
               onSubmitted: (val) {
@@ -61,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }
               },
-              // 🔎 Search button tap pe:
+              //  Search button :
               onSearchTap: () {
                 final query = _searchController.text.trim();
                 if (query.isNotEmpty) {
@@ -76,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
 
-            /// 🕓 Recent Searches (using widget)
+            //Recent Searches
             if (subjectProvider.recentSearches.isNotEmpty) ...[
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
 
-            /// 📚 Popular Subjects
+            //Popular Subjects
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text("Popular Subjects",
@@ -131,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            /// ❤️ Favorites Section
+            //Favorites Section
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text("Your Favorites",

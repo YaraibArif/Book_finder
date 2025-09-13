@@ -195,7 +195,7 @@ class _WorkDetailScreenState extends State<WorkDetailScreen> {
                       );
                     }
 
-                    // ✅ Save ya Remove dono case mein navigate hoga
+                    // in case Save 0r Remove navigate
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const FavoritesScreen()),

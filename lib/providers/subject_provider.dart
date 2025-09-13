@@ -36,10 +36,10 @@ class SubjectProvider with ChangeNotifier {
           final response = await _dio.get(
             url,
             queryParameters: {
-              "limit": 10, // ✅ sirf limit rakhi
+              "limit": 10, //forlimit
             },
             options: Options(
-              responseType: ResponseType.json, // ✅ force JSON
+              responseType: ResponseType.json,
               validateStatus: (status) => status != null && status < 500,
             ),
           );

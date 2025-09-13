@@ -64,7 +64,7 @@ class SubjectCard extends StatelessWidget {
                       );
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("$name added to favorites ✅")),
+                        SnackBar(content: Text("$name added to favorites ")),
                       );
                     },
                     icon: const Icon(Icons.favorite),

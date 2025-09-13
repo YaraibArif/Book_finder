@@ -40,7 +40,7 @@ class FavoriteCard extends StatelessWidget {
             onPressed: () {
               favoritesProvider.removeFavorite(book.id);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("${book.title} removed ❌")),
+                SnackBar(content: Text("${book.title} removed")),
               );
             },
           ),

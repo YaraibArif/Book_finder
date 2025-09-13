@@ -6,7 +6,7 @@ class AuthProvider extends ChangeNotifier {
   final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email'],
-    clientId: "567654118983-434ihaoc0h00lpaqofv6mmi0parlcqu9.apps.googleusercontent.com", // ye Firebase Console Web client ID
+    clientId: "567654118983-434ihaoc0h00lpaqofv6mmi0parlcqu9.apps.googleusercontent.com", // this is Firebase Console Web client ID
   );
 
 
@@ -72,7 +72,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// ✅ Single signOut method (merged)
+  //Single signOut method
   Future<void> signOut() async {
     await _auth.signOut();
     await _googleSignIn.signOut();
@@ -84,7 +84,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 🔹 Utility for local dummy login (optional, for testing without Firebase)
+  //Utility for local dummy login (optional, for testing without Firebase)
   void signInDummy({String? userId, String? email}) {
     _isSignedIn = true;
     _userId = userId ?? "dummy_user";
