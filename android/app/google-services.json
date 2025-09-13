@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "567654118983",
+    "project_id": "bookfinder-1719f",
+    "storage_bucket": "bookfinder-1719f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567654118983:android:5ccccb8722d476b6022362",
+        "android_client_info": {
+          "package_name": "com.example.book_finder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "567654118983-v2io9phbtftdr5fb3bflgb41e9dfusem.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.book_finder",
+            "certificate_hash": "8d131be987cf16645c951b6f6a1792272729ed77"
+          }
+        },
+        {
+          "client_id": "567654118983-434ihaoc0h00lpaqofv6mmi0parlcqu9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCerZUatirE2-EhHrbHTcNJqc0uilVPePM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "567654118983-434ihaoc0h00lpaqofv6mmi0parlcqu9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
