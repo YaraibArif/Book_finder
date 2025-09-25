@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../theme/theme.dart';
 import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -30,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen>
     Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const onboardingScreen()),
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
       );
     });
   }
@@ -44,18 +45,10 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background, // 👈 HomeScreen jaisa background
       body: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF6A1B9A),
-              Color(0xFF2962FF),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        color: AppColors.background,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

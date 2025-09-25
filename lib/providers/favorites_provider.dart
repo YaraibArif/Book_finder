@@ -1,47 +1,39 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/book.dart';
+import '../respositories/favorites_repository.dart';
 
 class FavoritesProvider with ChangeNotifier {
-  final _firestore = FirebaseFirestore.instance;
-  final String userId;
+  final FavoritesRepository _repository;
+  final String _userId;
 
-  FavoritesProvider({required this.userId});
+  FavoritesProvider({
+    required FavoritesRepository repository,
+    required String userId,
+  })  : _repository = repository,
+        _userId = userId;
 
-  // Local cache
+  String get userId => _userId;
+
   final List<FavoriteBook> _favorites = [];
+  List<FavoriteBook> get favorites => List.unmodifiable(_favorites);
 
-  List<FavoriteBook> get favorites => _favorites;
-
-  //Stream user favorites
+  /// 🔹 Stream favorites from Firestore
   Stream<List<FavoriteBook>> get favoritesStream {
-    return _firestore
-        .collection("users")
-        .doc(userId)
-        .collection("favorites")
-        .orderBy("addedAt", descending: true)
-        .snapshots()
-        .map((snapshot) {
-      final list = snapshot.docs
-          .map((doc) => FavoriteBook.fromMap(doc.data()))
-          .toList();
-
-      // local cache update
+    return _repository.streamFavorites(_userId).map((list) {
       _favorites
         ..clear()
         ..addAll(list);
-
       notifyListeners();
       return list;
     });
   }
 
-  //Check if book is favorite
+  /// 🔹 Check if a book is favorite
   bool isFavorite(String bookId) {
     return _favorites.any((book) => book.id == bookId);
   }
 
-  //Add book to favorites
+  /// 🔹 Add favorite
   Future<void> addFavorite({
     required String workKey,
     required String title,
@@ -58,21 +50,39 @@ class FavoritesProvider with ChangeNotifier {
       addedAt: DateTime.now(),
     );
 
-    await _firestore
-        .collection("users")
-        .doc(userId)
-        .collection("favorites")
-        .doc(book.id)
-        .set(book.toMap());
+    // Local update
+    _favorites.insert(0, book);
+    notifyListeners();
+
+    // Firestore update
+    await _repository.addFavorite(_userId, book);
   }
 
-  //Remove book from favorites
+  /// 🔹 Remove favorite
   Future<void> removeFavorite(String bookId) async {
-    await _firestore
-        .collection("users")
-        .doc(userId)
-        .collection("favorites")
-        .doc(bookId)
-        .delete();
+    _favorites.removeWhere((book) => book.id == bookId);
+    notifyListeners();
+
+    await _repository.removeFavorite(_userId, bookId);
   }
+
+  /// 🔹 Refresh (force reload from Firestore)
+  bool _isRefreshing = false;
+  bool get isRefreshing => _isRefreshing;
+
+  Future<void> refreshFavorites() async {
+    _isRefreshing = true;
+    notifyListeners();
+
+    final snapshotStream = _repository.streamFavorites(_userId);
+    final list = await snapshotStream.first;
+
+    _favorites
+      ..clear()
+      ..addAll(list);
+
+    _isRefreshing = false;
+    notifyListeners();
+  }
+
 }

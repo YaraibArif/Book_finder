@@ -15,36 +15,66 @@ class FavoriteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final coverUrl = book.coverUrl ??
-        "https://via.placeholder.com/80x120.png?text=No+Cover";
+        "https://via.placeholder.com/120x180.png?text=No+Cover";
 
     return Card(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.network(
-            coverUrl,
-            height: 120,
-            width: 80,
-            fit: BoxFit.cover,
-            errorBuilder: (ctx, _, __) =>
-            const Icon(Icons.book, size: 50),
+      clipBehavior: Clip.antiAlias, // ✅ rounded corners respected
+      child: InkWell(
+        onTap: () {
+          // 👇 future: detail screen par navigate kar sakte ho
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // ✅ Book Cover
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  coverUrl,
+                  height: 140,
+                  width: 100,
+                  fit: BoxFit.cover,
+                  errorBuilder: (ctx, _, __) => const Icon(
+                    Icons.book,
+                    size: 60,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // ✅ Book Title
+              Text(
+                book.title,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 6),
+
+              // ✅ Delete Button
+              IconButton(
+                icon: const Icon(Icons.delete_forever, color: Colors.redAccent),
+                onPressed: () {
+                  favoritesProvider.removeFavorite(book.id);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("${book.title} removed"),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            book.title,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () {
-              favoritesProvider.removeFavorite(book.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("${book.title} removed")),
-              );
-            },
-          ),
-        ],
+        ),
       ),
     );
   }

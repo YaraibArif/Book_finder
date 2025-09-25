@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/search_provider.dart';
 import '../../widgets/book_card.dart';
+import '../../utils/settings_manager.dart'; // ✅ import SettingsManager
 
 class SearchScreen extends StatefulWidget {
   final String initialQuery;
@@ -14,11 +15,18 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
   String _filter = "All";
+  String _searchMode = "press"; // default
 
   @override
   void initState() {
     super.initState();
     _controller.text = widget.initialQuery;
+
+    // ✅ load search mode from preferences
+    SettingsManager.getSearchMode().then((mode) {
+      setState(() => _searchMode = mode);
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<SearchProvider>().search(query: widget.initialQuery);
     });
@@ -43,13 +51,24 @@ class _SearchScreenState extends State<SearchScreen> {
             hintText: "Search books, authors, ISBN...",
             border: InputBorder.none,
           ),
-          onSubmitted: (_) => _onSearch(),
+          // ✅ Behavior depends on searchMode
+          onChanged: (val) {
+            if (_searchMode == "on_type") {
+              _onSearch();
+            }
+          },
+          onSubmitted: (_) {
+            if (_searchMode == "press") {
+              _onSearch();
+            }
+          },
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: _onSearch,
-          )
+          if (_searchMode == "press") // ✅ only show button in press mode
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: _onSearch,
+            ),
         ],
       ),
       body: Column(

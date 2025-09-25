@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/favorites_provider.dart';
+import '../theme/theme.dart'; // 👈 AppColors import karo
 
 class SubjectCard extends StatelessWidget {
   final String slug;
@@ -21,6 +22,7 @@ class SubjectCard extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Card(
+      color: AppColors.card, // 👈 theme card color
       child: Container(
         width: screenWidth * 0.35,
         padding: const EdgeInsets.all(8),
@@ -28,9 +30,12 @@ class SubjectCard extends StatelessWidget {
           children: [
             Text(
               name,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textMain, // 👈 theme text color
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height:8),
             Expanded(
               child: Wrap(
                 alignment: WrapAlignment.center,
@@ -43,8 +48,11 @@ class SubjectCard extends StatelessWidget {
                     height: screenWidth * 0.22,
                     width: screenWidth * 0.15,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.book, size: 40),
+                    errorBuilder: (_, __, ___) => Icon(
+                      Icons.book,
+                      size: 40,
+                      color: AppColors.primary, // 👈 theme accent
+                    ),
                   ),
                 )
                     .toList(),
@@ -58,13 +66,13 @@ class SubjectCard extends StatelessWidget {
                       await favProvider.addFavorite(
                         workKey: slug,
                         title: name,
-                        authors: const [], // Subjects pe authors nahi hote
+                        authors: const [],
                         coverUrl: covers.isNotEmpty ? covers.first : null,
                         firstPublishYear: null,
                       );
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("$name added to favorites ")),
+                        SnackBar(content: Text("$name added to favorites")),
                       );
                     },
                     icon: const Icon(Icons.favorite),
@@ -72,7 +80,6 @@ class SubjectCard extends StatelessWidget {
                   );
                 },
               )
-
             ],
           ],
         ),

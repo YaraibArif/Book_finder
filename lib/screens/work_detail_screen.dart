@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/favorites_provider.dart';
+import '../respositories/author_repository.dart';
+import '../respositories/book_repository.dart';
+import '../respositories/cover_repository.dart';
 import 'editions_screen.dart';
+import 'author_screen.dart';
 import 'favourites_screen.dart';
+import 'subject_books_screen.dart';
 
 class WorkDetailScreen extends StatefulWidget {
   final String workKey;
@@ -20,6 +23,11 @@ class _WorkDetailScreenState extends State<WorkDetailScreen> {
   bool _loading = true;
   String? _error;
   Map<String, dynamic>? _data;
+  List<Map<String, String>> _authors = [];
+
+  final _bookRepository = BookRepository();
+  final _authorRepository = AuthorRepository();
+  final _coverRepository = CoverRepository();
 
   @override
   void initState() {
@@ -34,40 +42,64 @@ class _WorkDetailScreenState extends State<WorkDetailScreen> {
     });
 
     try {
-      final url = "https://openlibrary.org${widget.workKey}.json";
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        setState(() {
-          _data = json.decode(response.body);
-          _loading = false;
-        });
-      } else {
-        setState(() {
-          _error = "Server error: ${response.statusCode}";
-          _loading = false;
-        });
-      }
+      final data = await _bookRepository.getWork(widget.workKey);
+      setState(() {
+        _data = data;
+        _loading = false;
+      });
+      _loadAuthors(data['authors']);
     } catch (e) {
       setState(() {
-        _error = "Failed to load details. Check your connection.";
+        _error = "Failed to load details: $e";
         _loading = false;
       });
     }
   }
 
+  Future<void> _loadAuthors(List<dynamic>? authorsData) async {
+    if (authorsData == null) return;
+    List<Map<String, String>> temp = [];
+
+    for (var a in authorsData) {
+      final key = a['author']?['key'];
+      if (key != null) {
+        try {
+          final authorData = await _authorRepository.getAuthor(key);
+          final name = authorData['name'] ?? "Unknown Author";
+          temp.add({"id": key, "name": name});
+        } catch (_) {
+          temp.add({"id": key, "name": "Unknown Author"});
+        }
+      }
+    }
+
+    setState(() {
+      _authors = temp;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (_error != null) {
       return Scaffold(
         appBar: AppBar(title: const Text("Book Details")),
-        body: Center(child: Text(_error!)),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(_error!),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: _fetchWorkDetails,
+                child: const Text("Retry"),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
@@ -75,9 +107,10 @@ class _WorkDetailScreenState extends State<WorkDetailScreen> {
     final description = _data?['description'];
     final firstPublishYear = _data?['first_publish_date'] ?? "";
     final covers = _data?['covers'] as List?;
-    final coverUrl = (covers != null && covers.isNotEmpty)
-        ? "https://covers.openlibrary.org/b/id/${covers.first}-L.jpg"
-        : "https://via.placeholder.com/200x300.png?text=No+Cover";
+    final coverUrl = _coverRepository.getCoverUrl(
+      (covers != null && covers.isNotEmpty) ? covers.first : null,
+      size: "L",
+    );
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),
@@ -86,31 +119,75 @@ class _WorkDetailScreenState extends State<WorkDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// Book Cover
             Center(
-              child: Image.network(
-                coverUrl,
-                height: 250,
-                fit: BoxFit.cover,
-              ),
+              child: Image.network(coverUrl, height: 250, fit: BoxFit.cover),
             ),
             const SizedBox(height: 16),
 
-            /// Title
             Text(
               title,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
-
-            /// First Publish Year
-            const SizedBox(height: 8),
             if (firstPublishYear.isNotEmpty)
-              Text("First Published: $firstPublishYear",
-                  style: const TextStyle(color: Colors.grey)),
+              Text(
+                "First Published: $firstPublishYear",
+                style: const TextStyle(color: Colors.grey),
+              ),
 
-            /// Description
+            /// Authors
+            if (_authors.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                children: _authors
+                    .map(
+                      (a) => ActionChip(
+                        label: Text(a['name'] ?? "Unknown"),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AuthorScreen(authorId: a['id']!),
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
+
+            /// Subjects
+            if (_data?['subjects'] != null) ...[
+              const SizedBox(height: 16),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: (_data?['subjects'] as List)
+                      .map<Widget>(
+                        (s) => Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: ActionChip(
+                            label: Text(s.toString()),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      SubjectBooksScreen(subject: s),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ],
+
             const SizedBox(height: 16),
             Text(
               description is String
@@ -119,7 +196,6 @@ class _WorkDetailScreenState extends State<WorkDetailScreen> {
               style: const TextStyle(fontSize: 16),
             ),
 
-            /// See Editions Button
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
@@ -138,36 +214,28 @@ class _WorkDetailScreenState extends State<WorkDetailScreen> {
             const SizedBox(height: 16),
             Consumer<FavoritesProvider?>(
               builder: (context, favoritesProvider, _) {
-                final authProvider =
-                Provider.of<AuthProvider>(context, listen: false);
+                final authProvider = Provider.of<AuthProvider>(
+                  context,
+                  listen: false,
+                );
                 final isSignedIn = authProvider.isSignedIn;
-                final workKey = widget.workKey;
+                final workKey = widget.workKey.replaceAll("/", "_"); // safe ID
                 final title = _data?['title'] ?? "Unknown";
-
-                final authors = (_data?['authors'] as List?)
-                    ?.map((a) => a['name']?.toString() ?? "")
-                    .where((a) => a.isNotEmpty)
-                    .toList() ??
-                    [];
+                final authors = _authors.map((a) => a['name']!).toList();
 
                 final coverList = _data?['covers'] as List?;
                 final coverId = (coverList != null && coverList.isNotEmpty)
                     ? coverList.first
                     : null;
-
-                final coverUrl = coverId != null
-                    ? "https://covers.openlibrary.org/b/id/$coverId-M.jpg"
-                    : null;
-
-                final isFavorite =
-                    favoritesProvider?.isFavorite(workKey) ?? false;
+                final coverUrl = _coverRepository.getCoverUrl(coverId);
 
                 if (!isSignedIn || favoritesProvider == null) {
                   return ElevatedButton.icon(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text("Please sign in to save favorites.")),
+                          content: Text("Please sign in to save favorites."),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.favorite_border),
@@ -175,12 +243,16 @@ class _WorkDetailScreenState extends State<WorkDetailScreen> {
                   );
                 }
 
+                final isFavorite = favoritesProvider.isFavorite(workKey);
+
                 return ElevatedButton.icon(
                   onPressed: () async {
                     if (isFavorite) {
                       await favoritesProvider.removeFavorite(workKey);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Removed from favorites ❌")),
+                        const SnackBar(
+                          content: Text("Removed from favorites ❌"),
+                        ),
                       );
                     } else {
                       await favoritesProvider.addFavorite(
@@ -194,19 +266,14 @@ class _WorkDetailScreenState extends State<WorkDetailScreen> {
                         const SnackBar(content: Text("Saved to favorites ✅")),
                       );
                     }
-
-                    // in case Save 0r Remove navigate
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const FavoritesScreen()),
-                    );
                   },
-                  icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
+                  icon: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                  ),
                   label: Text(
                     isFavorite ? "Remove from Favorites" : "Save to Favorites",
                   ),
                 );
-
               },
             ),
           ],

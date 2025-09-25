@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class FavoriteBook {
   final String id;
   final String title;
@@ -22,10 +24,9 @@ class FavoriteBook {
       "authors": authors,
       "coverUrl": coverUrl,
       "firstPublishYear": firstPublishYear,
-      "addedAt": addedAt.toIso8601String(),
+      "addedAt": addedAt.toIso8601String(), // local storage
     };
   }
-
   factory FavoriteBook.fromMap(Map<String, dynamic> map) {
     return FavoriteBook(
       id: map["id"] ?? "",
@@ -33,7 +34,10 @@ class FavoriteBook {
       authors: (map["authors"] as List?)?.map((e) => e.toString()).toList() ?? [],
       coverUrl: map["coverUrl"],
       firstPublishYear: map["firstPublishYear"],
-      addedAt: DateTime.tryParse(map["addedAt"] ?? "") ?? DateTime.now(),
+      addedAt: (map["addedAt"] is Timestamp)
+          ? (map["addedAt"] as Timestamp).toDate()
+          : DateTime.tryParse(map["localAddedAt"] ?? "") ?? DateTime.now(),
     );
   }
+
 }

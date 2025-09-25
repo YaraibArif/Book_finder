@@ -59,7 +59,7 @@ class SearchProvider extends ChangeNotifier {
 
       final response = await http
           .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -112,19 +112,24 @@ class SearchProvider extends ChangeNotifier {
   }
 
   String _buildUrl(String query, String filter, int page) {
+    String encodedQuery = Uri.encodeComponent(query.trim()); // 👈 encoding + trim
+
     String base = "https://openlibrary.org/search.json?";
     if (filter == "Title") {
-      base += "title=$query";
+      base += "title=$encodedQuery";
     } else if (filter == "Author") {
-      base += "author=$query";
+      base += "author=$encodedQuery";
     } else if (filter == "ISBN") {
-      base += "isbn=$query";
+      base += "isbn=$encodedQuery";
     } else {
-      base += "q=$query";
+      base += "q=$encodedQuery";
     }
     base += "&page=$page";
+
+    print("📡 Requesting: $base"); // 👈 debugging ke liye print
     return base;
   }
+
 
   void _scrollListener() {
     if (scrollController.position.pixels >=
