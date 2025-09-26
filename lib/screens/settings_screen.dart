@@ -51,7 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await SettingsManager.clearCache();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Cache cleared ✅")),
+          const SnackBar(content: Text("Cache cleared ")),
         );
       }
     }

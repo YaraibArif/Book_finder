@@ -112,7 +112,7 @@ class SearchProvider extends ChangeNotifier {
   }
 
   String _buildUrl(String query, String filter, int page) {
-    String encodedQuery = Uri.encodeComponent(query.trim()); // 👈 encoding + trim
+    String encodedQuery = Uri.encodeComponent(query.trim()); // encoding + trim
 
     String base = "https://openlibrary.org/search.json?";
     if (filter == "Title") {
@@ -126,7 +126,7 @@ class SearchProvider extends ChangeNotifier {
     }
     base += "&page=$page";
 
-    print("📡 Requesting: $base"); // 👈 debugging ke liye print
+    print("📡 Requesting: $base"); // for debugging
     return base;
   }
 

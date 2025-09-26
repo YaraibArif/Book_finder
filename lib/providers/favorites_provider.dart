@@ -17,7 +17,7 @@ class FavoritesProvider with ChangeNotifier {
   final List<FavoriteBook> _favorites = [];
   List<FavoriteBook> get favorites => List.unmodifiable(_favorites);
 
-  /// 🔹 Stream favorites from Firestore
+  ///  Stream favorites from Firestore
   Stream<List<FavoriteBook>> get favoritesStream {
     return _repository.streamFavorites(_userId).map((list) {
       _favorites
@@ -28,12 +28,12 @@ class FavoritesProvider with ChangeNotifier {
     });
   }
 
-  /// 🔹 Check if a book is favorite
+  ///  Check if a book is favorite
   bool isFavorite(String bookId) {
     return _favorites.any((book) => book.id == bookId);
   }
 
-  /// 🔹 Add favorite
+  ///  Add favorite
   Future<void> addFavorite({
     required String workKey,
     required String title,
@@ -66,7 +66,7 @@ class FavoritesProvider with ChangeNotifier {
     await _repository.removeFavorite(_userId, bookId);
   }
 
-  /// 🔹 Refresh (force reload from Firestore)
+  /// Refresh (force reload from Firestore)
   bool _isRefreshing = false;
   bool get isRefreshing => _isRefreshing;
 

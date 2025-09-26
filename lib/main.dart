@@ -26,7 +26,7 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider(create: (_) => SearchProvider()),
 
-        /// ✅ Favorites depends on AuthProvider
+        /// Favorites depends on AuthProvider
         ChangeNotifierProxyProvider<AuthProvider, FavoritesProvider?>(
           create: (_) => null,
           update: (_, auth, prev) {
@@ -34,7 +34,6 @@ Future<void> main() async {
               if (prev != null && prev.userId == auth.userId) {
                 return prev;
               }
-              // 👇 yahan repository inject karna hai
               return FavoritesProvider(
                 repository: FavoritesRepository(),
                 userId: auth.userId!,

@@ -31,11 +31,11 @@ class SubjectProvider with ChangeNotifier {
   final int _limit = 25;
   bool _hasMore = true;
 
-  /// 🔹 For single subject (See All screen)
+  /// For single subject (See All screen)
   List<Map<String, dynamic>> works = [];
   Map<String, dynamic>? subjectMeta;
 
-  /// 🔹 Fetch multiple subjects (for home carousel)
+  /// Fetch multiple subjects (for home carousel)
   Future<void> fetchSubjects(List<String> subjectSlugs,
       {bool loadMore = false}) async {
     if (isLoading || (isLoadingMore && loadMore)) return;
@@ -106,7 +106,7 @@ class SubjectProvider with ChangeNotifier {
     }
   }
 
-  /// 🔹 Fetch single subject (for See All button)
+  /// Fetch single subject (for See All button)
   Future<void> fetchSubject(String slug, {bool loadMore = false}) async {
     if (loadMore) {
       isLoadingMore = true;
@@ -150,7 +150,7 @@ class SubjectProvider with ChangeNotifier {
 
   bool get hasMore => _hasMore;
 
-  /// 🔹 Save recent search locally
+  ///  Save recent search locally
   void addRecentSearch(String query) {
     if (!recentSearches.contains(query)) {
       recentSearches.insert(0, query);

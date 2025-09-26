@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import '../widgets/editions_card.dart'; // ✅ EditionCard widget
+import '../widgets/editions_card.dart';
 
 class EditionsScreen extends StatefulWidget {
   final String workKey;
@@ -60,7 +60,7 @@ class _EditionsScreenState extends State<EditionsScreen> {
             _allEditions.addAll(editions);
             _offset += _limit;
 
-            // ✅ Build global language index from all editions
+            // Build global language index from all editions
             for (var e in editions) {
               final langs = e['languages'] as List?;
               if (langs != null) {

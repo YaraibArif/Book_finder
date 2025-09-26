@@ -4,7 +4,7 @@ import '../models/book.dart';
 class FavoritesRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// 🔹 Stream all favorites of user
+  /// Stream all favorites of user
   Stream<List<FavoriteBook>> streamFavorites(String userId) {
     return _firestore
         .collection("users")
@@ -16,7 +16,7 @@ class FavoritesRepository {
       return snapshot.docs.map((doc) {
         final data = doc.data();
 
-        // ✅ Fallback logic
+        //  Fallback logic
         if (data["addedAt"] == null && data["localAddedAt"] != null) {
           data["addedAt"] =
               Timestamp.fromDate(DateTime.parse(data["localAddedAt"]));
@@ -29,7 +29,7 @@ class FavoritesRepository {
     });
   }
 
-  /// 🔹 Add new favorite book
+  /// Add new favorite book
   Future<void> addFavorite(String userId, FavoriteBook book) async {
     await _firestore
         .collection("users")
@@ -43,7 +43,7 @@ class FavoritesRepository {
     }, SetOptions(merge: true));
   }
 
-  /// 🔹 Remove favorite book
+  ///  Remove favorite book
   Future<void> removeFavorite(String userId, String bookId) async {
     await _firestore
         .collection("users")
